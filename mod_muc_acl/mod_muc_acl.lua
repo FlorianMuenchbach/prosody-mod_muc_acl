@@ -5,6 +5,12 @@ local nodeprep = require "util.encodings".stringprep.nodeprep;
 local unprepped_access_lists = module:get_option("muc_access_lists", {});
 local access_lists = {};
 
+function Set (list)
+  local set = {}
+  for _, l in ipairs(list) do set[l] = true end
+  return set
+end
+
 -- Make sure all input is prepped
 for unprepped_room_name, unprepped_list in pairs(unprepped_access_lists) do
 	local prepped_room_name = nodeprep(unprepped_room_name);
@@ -13,13 +19,14 @@ for unprepped_room_name, unprepped_list in pairs(unprepped_access_lists) do
 	else
 		local prepped_list = {};
 		for _, unprepped_jid in ipairs(unprepped_list) do
-			local prepped_jid = jid.prep(jid);
+			local prepped_jid = jid.prep(unprepped_jid);
 			if not prepped_jid then
 				module:log("error", "Invalid JID: %s", unprepped_jid);
 			else
-				table.insert(prepped_list, jid.pep(jid));
+				table.insert(prepped_list, prepped_jid);
 			end
 		end
+		access_lists[prepped_room_name] = Set(prepped_list);
 	end
 end
 
