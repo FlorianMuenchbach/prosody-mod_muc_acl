@@ -2,12 +2,11 @@ local st = require "util.stanza";
 local jid = require "util.jid";
 local nodeprep = require "util.encodings".stringprep.nodeprep;
 
-local unprepped_access_lists = module:get_option("muc_access_lists", {});
+local unprepped_access_lists = module:get_option("muc_acls", {});
 local debug = module:get_option_boolean("muc_acl_debug", false);
 local room_acls = {};
 
 module:log("error", "Loading MUC ACLs...");
-
 
 function Set (list)
   local set = {}
