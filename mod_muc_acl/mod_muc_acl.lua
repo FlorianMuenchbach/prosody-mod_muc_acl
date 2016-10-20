@@ -110,9 +110,11 @@ if debug then
 end
 
 
-local function is_restricted(room, who)
-	local allowed = room_acls[room];
+local function check_acl_for_jid(acl, who)
+	return acl ~= nil and (acl[who] or acl[select(2, jid.split(who))]);
+end
 
+local function is_restricted(room, who)
 	-- A client is allowed to join, if ...
 	-- ... the room is marked public (only applies when restriced_by_default is set)
 	-- ... the room is public, since restriced_by_default is false and it has not been
@@ -120,12 +122,22 @@ local function is_restricted(room, who)
 	-- ... the room is private and has an ACL, which contains the user's jid or domain
 	-- ... the room is private, since restriced_by_default is true and the user's jid/domain is in
 	-- 		the default_acl list
+	local rv = true;
 
-	if allowed == nil or allowed[who] or allowed[select(2, jid.split(who))] then
-		return nil;
+	if restriced_by_default and ( public_rooms[room] ~= nil or check_acl_for_jid(default_acl, who)) then
+		rv = false;
+	elseif (not restriced_by_default) and room_acls[room] == nil then
+		rv = false;
 	end
 
-	return "forbidden";
+	if rv and room_acls[room] ~= nil and check_acl_for_jid(room_acls[room], who) then
+		rv = false;
+	end
+
+	module:log("info", "%s tried to join %s: Access %s.", who, room,
+		(rv and "denied" or "granted")
+	);
+	return rv;
 end
 
 module:hook("presence/full", function(event)
@@ -143,10 +155,10 @@ module:hook("presence/full", function(event)
 	local who = jid.bare(stanza.attr.from)
 
 	-- Checking whether room is restricted
-	local check_restricted = is_restricted(room, who)
-        if check_restricted ~= nil then
-                event.allowed = false;
-                event.stanza.attr.type = 'error';
-	        return event.origin.send(st.error_reply(event.stanza, "cancel", "forbidden", "You're not allowed to enter this room: " .. check_restricted));
-        end
+    if is_restricted(room, who) then
+            event.allowed = false;
+            event.stanza.attr.type = 'error';
+	    return event.origin.send(st.error_reply(event.stanza, "cancel", "forbidden",
+			"You're not allowed to enter this room: forbidden."));
+    end
 end, 10);
