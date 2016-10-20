@@ -21,7 +21,7 @@ Copy the module to the prosody modules directory.
 Configuration
 =============
 
-The module should be added to the list of modules of the muc component in the
+The module should be added to the list of modules of the MUC component in the
 config file.
 
     Component "conference.example.com" "muc"
@@ -39,7 +39,7 @@ config file.
      }
 
 The above example allows all users of the example.com server plus the two users
-user@jabber.example.com and user@examplejabber.com access to a muc called
+user@jabber.example.com and user@examplejabber.com access to a MUC called
 "chatroom".
 
 The following describes the configuration options available:
@@ -47,10 +47,10 @@ The following describes the configuration options available:
 
   Name                                Default   Description
   ----------------------------------- --------- ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  muc\_acls                           {}        Table in key/value format. The key is the name of the muc (the part before the @), the value is a list of user jids or domains that are allowed to access each muc.
-  muc\_acl\_public\_rooms             {}        List (comma separated) of mucs which can be accessed by any jabber user of any server. (**muc\_acl\_restricted\_by\_default** must be set to true)
+  muc\_acls                           {}        Table in key/value format. The key is the name of the MUC (the part before the @), the value is a list of user jids or domains that are allowed to access each muc.
+  muc\_acl\_public\_rooms             {}        List (comma separated) of MUCs which can be accessed by any jabber user of any server. (**muc\_acl\_restricted\_by\_default** must be set to true)
   muc\_acl\_default                   {}        Default access list. It can contain JIDs or domain names and will be applied to restrict access to all rooms which are neither in the **muc\_acl\_public\_rooms** list nor the **muc\_acls** list. (**muc\_acl\_restricted\_by\_default** must be set to true)
-  muc\_acl\_restricted\_by\_default   false     Restricts access to all mucs by default.
+  muc\_acl\_restricted\_by\_default   false     Restricts access to all MUCs by default.
   muc\_acl\_debug                     false     Enables debugging. (debug logging must be enabled in prosody)
 
 
