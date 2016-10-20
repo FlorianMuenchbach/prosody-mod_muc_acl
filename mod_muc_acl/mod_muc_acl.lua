@@ -38,8 +38,8 @@ local function prepare_jid_list(jid_list)
 end
 
 -- Make sure all input is prepped
-if not type(unprepped_access_lists) == 'table' then
-	module:log("error", "muc_default_acl must be a table.")
+if type(unprepped_access_lists) ~= 'table' then
+	module:log("error", "muc_acls must be a table (is %s).", type(unprepped_access_lists));
 else
 	for unprepped_room_name, unprepped_list in pairs(unprepped_access_lists) do
 		module:log("error", "unprepped_room_name: %s", unprepped_room_name);
@@ -52,8 +52,8 @@ else
 	end
 end
 
-if not type(unprepped_public_rooms) == 'table' then
-	module:log("error", "muc_access_public must be a table.")
+if type(unprepped_public_rooms) ~= 'table' then
+	module:log("error", "muc_access_public must be a table (is %s).", type(unprepped_public_rooms))
 else
 	if #unprepped_public_rooms > 0 and not restriced_by_default then
 		module:log("warn", "A list of public rooms does not make sense, "
@@ -74,8 +74,8 @@ else
 end
 
 
-if not type(unprepped_default_acl) == 'table' then
-	module:log("error", "muc_default_acl must be a table.")
+if type(unprepped_default_acl) ~= 'table' then
+	module:log("error", "muc_acl_default must be a table.")
 else
 	if #unprepped_default_acl > 0 and not restriced_by_default then
 		module:log("warn", "default_acl will be ignored because "
