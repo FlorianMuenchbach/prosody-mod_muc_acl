@@ -13,7 +13,7 @@ local public_rooms = {};
 local room_acls = {};
 local default_acl = {};
 
-module:log("error", "Loading MUC ACLs...");
+module:log("info", "Loading MUC ACLs...");
 
 function Set (list)
   local set = {}
@@ -42,7 +42,6 @@ if type(unprepped_access_lists) ~= 'table' then
 	module:log("error", "muc_acls must be a table (is %s).", type(unprepped_access_lists));
 else
 	for unprepped_room_name, unprepped_list in pairs(unprepped_access_lists) do
-		module:log("error", "unprepped_room_name: %s", unprepped_room_name);
 		local prepped_room_name = nodeprep(unprepped_room_name);
 		if not prepped_room_name then
 			module:log("error", "Invalid room name: %s", unprepped_room_name);
