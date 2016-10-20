@@ -3,8 +3,15 @@ local jid = require "util.jid";
 local nodeprep = require "util.encodings".stringprep.nodeprep;
 
 local unprepped_access_lists = module:get_option("muc_acls", {});
+local unprepped_public_rooms = module:get_option("muc_acl_public_rooms", {});
+local unprepped_default_acl = module:get_option("muc_acl_default", {});
+local restriced_by_default = module:get_option_boolean("muc_acl_restricted_by_default", false);
 local debug = module:get_option_boolean("muc_acl_debug", false);
+
+local public_rooms = {};
+
 local room_acls = {};
+local default_acl = {};
 
 module:log("error", "Loading MUC ACLs...");
 
@@ -42,6 +49,39 @@ else
 		else
 			room_acls[prepped_room_name] = Set(prepare_jid_list(unprepped_list));
 		end
+	end
+end
+
+if not type(unprepped_public_rooms) == 'table' then
+	module:log("error", "muc_access_public must be a table.")
+else
+	if #unprepped_public_rooms > 0 and not restriced_by_default then
+		module:log("warn", "A list of public rooms does not make sense, "
+			.. "if room access is not restricted by default. "
+			.. "The list will be ignored.");
+	elseif #unprepped_public_rooms > 0 and restriced_by_default then
+		local public_rooms_list = {}
+		for _, unprepped_room_name in pairs(unprepped_public_rooms) do
+			local prepped_room_name = nodeprep(unprepped_room_name);
+			if not prepped_room_name then
+				module:log("error", "Invalid room name (in public_rooms): %s", unprepped_room_name);
+			else
+				table.insert(public_rooms_list, unprepped_room_name);
+			end
+		end
+		public_rooms = Set(public_rooms_list);
+	end
+end
+
+
+if not type(unprepped_default_acl) == 'table' then
+	module:log("error", "muc_default_acl must be a table.")
+else
+	if #unprepped_default_acl > 0 and not restriced_by_default then
+		module:log("warn", "default_acl will be ignored because "
+			.. "muc_acl_restricted_by_default is not set.");
+	elseif #unprepped_default_acl > 0 and restriced_by_default then
+		default_acl = Set(prepare_jid_list(unprepped_default_acl));
 	end
 end
 
