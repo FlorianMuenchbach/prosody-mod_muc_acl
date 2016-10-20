@@ -3,7 +3,10 @@ local jid = require "util.jid";
 local nodeprep = require "util.encodings".stringprep.nodeprep;
 
 local unprepped_access_lists = module:get_option("muc_access_lists", {});
-local access_lists = {};
+local room_acls = {};
+
+module:log("error", "Loading MUC ACLs...");
+
 
 function Set (list)
   local set = {}
@@ -11,33 +14,47 @@ function Set (list)
   return set
 end
 
--- Make sure all input is prepped
-for unprepped_room_name, unprepped_list in pairs(unprepped_access_lists) do
-	local prepped_room_name = nodeprep(unprepped_room_name);
-	if not prepped_room_name then
-		module:log("error", "Invalid room name: %s", unprepped_room_name);
-	else
-		local prepped_list = {};
-		for _, unprepped_jid in ipairs(unprepped_list) do
-			local prepped_jid = jid.prep(unprepped_jid);
-			if not prepped_jid then
-				module:log("error", "Invalid JID: %s", unprepped_jid);
-			else
-				table.insert(prepped_list, prepped_jid);
-			end
+local function prepare_jid_list(jid_list)
+	local prepared_jid_list = {}
+
+	for _, unprepped_jid in ipairs(jid_list) do
+		local prepped_jid = jid.prep(unprepped_jid);
+
+		if not prepped_jid then
+			module:log("error", "Invalid JID: %s", unprepped_jid);
+		else
+			table.insert(prepared_jid_list, prepped_jid);
 		end
-		access_lists[prepped_room_name] = Set(prepped_list);
+	end
+
+	return prepared_jid_list
+end
+
+-- Make sure all input is prepped
+if not type(unprepped_access_lists) == 'table' then
+	module:log("error", "muc_default_acl must be a table.")
+else
+	for unprepped_room_name, unprepped_list in pairs(unprepped_access_lists) do
+		module:log("error", "unprepped_room_name: %s", unprepped_room_name);
+		local prepped_room_name = nodeprep(unprepped_room_name);
+		if not prepped_room_name then
+			module:log("error", "Invalid room name: %s", unprepped_room_name);
+		else
+			room_acls[prepped_room_name] = Set(prepare_jid_list(unprepped_list));
+		end
 	end
 end
 
 local function is_restricted(room, who)
-	local allowed = access_lists[room];
+	local allowed = room_acls[room];
 
 	-- A client is allowed to join, if ...
-	-- ... the room is marked public (only applies when muc_restriced_by_default is set)
-	-- ... the room is public, since muc_restriced_by_default is false and it has not been restricted otherwise.
+	-- ... the room is marked public (only applies when restriced_by_default is set)
+	-- ... the room is public, since restriced_by_default is false and it has not been
+	-- 		restricted otherwise.
 	-- ... the room is private and has an ACL, which contains the user's jid or domain
-	-- ... the room is private, since muc_restriced_by_default is true and the user's jid/domain is in the default_acl list
+	-- ... the room is private, since restriced_by_default is true and the user's jid/domain is in
+	-- 		the default_acl list
 
 	if allowed == nil or allowed[who] or allowed[select(2, jid.split(who))] then
 		return nil;
