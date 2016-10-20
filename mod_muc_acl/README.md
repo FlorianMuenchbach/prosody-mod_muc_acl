@@ -76,3 +76,11 @@ Compatibility
 0.10   | Untested
 0.9    | Works
 0.8    | Should work
+
+
+Attribution
+===========
+
+This module is based on Matthew Wild's work, which can be found in the
+official Prosody modules repository:
+https://modules.prosody.im/mod_muc_access_control.html

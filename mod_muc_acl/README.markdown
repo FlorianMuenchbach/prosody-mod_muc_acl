@@ -45,7 +45,7 @@ user@jabber.example.com and user@examplejabber.com access to a muc called
 The following describes the configuration options available:
 
 
-  Name                                Default   Description     Example        Default value
+  Name                                Default   Description
   ----------------------------------- --------- ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   muc\_acls                           {}        Table in key/value format. The key is the name of the muc (the part before the @), the value is a list of user jids or domains that are allowed to access each muc.
   muc\_acl\_public\_rooms             {}        List (comma separated) of mucs which can be accessed by any jabber user of any server. (**muc\_acl\_restricted\_by\_default** must be set to true)
@@ -79,3 +79,10 @@ Compatibility
   0.9    Works
   0.8    Should work
   ------ -------------
+
+Attribution
+===========
+
+This module is based on Matthew Wild's work, which can be found in the
+official Prosody modules repository:
+https://modules.prosody.im/mod_muc_access_control.html
