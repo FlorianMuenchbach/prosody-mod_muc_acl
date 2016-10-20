@@ -86,13 +86,27 @@ else
 end
 
 if debug then
+	local list = "";
 	for room_name, room_acl in pairs(room_acls) do
-		local list = ""
+		list = "";
 		for acl_name, _ in pairs(room_acl) do
-			list = list .. tostring(acl_name) .. ", "
+			list = list .. tostring(acl_name) .. ", ";
 		end
 		module:log("debug", "ACL for room %s: %s", room_name, list);
 	end
+
+	module:log("debug", "Rooms are " .. (restriced_by_default and '' or 'not') .. " restricted by default");
+	list = "";
+	for _, room_name in pairs(public_rooms) do
+		list = list .. tostring(room_name) .. ", ";
+	end
+	module:log("debug", "Public rooms: %s", list);
+
+	list = "";
+	for _, acl_name in pairs(default_acl) do
+		list = list .. tostring(acl_name) .. ", ";
+	end
+	module:log("debug", "Default ACL: %s", list);
 end
 
 
