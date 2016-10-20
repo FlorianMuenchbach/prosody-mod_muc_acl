@@ -3,6 +3,7 @@ local jid = require "util.jid";
 local nodeprep = require "util.encodings".stringprep.nodeprep;
 
 local unprepped_access_lists = module:get_option("muc_access_lists", {});
+local debug = module:get_option_boolean("muc_acl_debug", false);
 local room_acls = {};
 
 module:log("error", "Loading MUC ACLs...");
@@ -44,6 +45,17 @@ else
 		end
 	end
 end
+
+if debug then
+	for room_name, room_acl in pairs(room_acls) do
+		local list = ""
+		for acl_name, _ in pairs(room_acl) do
+			list = list .. tostring(acl_name) .. ", "
+		end
+		module:log("debug", "ACL for room %s: %s", room_name, list);
+	end
+end
+
 
 local function is_restricted(room, who)
 	local allowed = room_acls[room];
