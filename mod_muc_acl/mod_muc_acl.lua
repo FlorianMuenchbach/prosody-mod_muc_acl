@@ -33,6 +33,12 @@ end
 local function is_restricted(room, who)
 	local allowed = access_lists[room];
 
+	-- A client is allowed to join, if ...
+	-- ... the room is marked public (only applies when muc_restriced_by_default is set)
+	-- ... the room is public, since muc_restriced_by_default is false and it has not been restricted otherwise.
+	-- ... the room is private and has an ACL, which contains the user's jid or domain
+	-- ... the room is private, since muc_restriced_by_default is true and the user's jid/domain is in the default_acl list
+
 	if allowed == nil or allowed[who] or allowed[select(2, jid.split(who))] then
 		return nil;
 	end
