@@ -27,7 +27,7 @@ config file.
     Component "conference.example.com" "muc"
       modules_enabled = {
         ...
-        "mod_muc_acl";
+        "muc_acl";
         ...
       }
       muc_acls = {
@@ -75,7 +75,8 @@ Compatibility
 =============
 
   ------ -------------
-  0.10   Untested
+  0.11   Works
+  0.10   Works
   0.9    Works
   0.8    Should work
   ------ -------------
